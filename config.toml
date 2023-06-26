@@ -1,0 +1,11 @@
+[database]
+dns = "root:Xiaowu.789@tcp(localhost:3306)/opside_analystic?charset=utf8mb4&parseTime=True&loc=Local"
+
+[redis]
+host = "127.0.0.1:6379"
+password = "12345678"
+db = 1
+
+[evm]
+# rpc = "https://rpc.ankr.com/eth"
+rpc = "https://rpc.ankr.com/eth_goerli"
