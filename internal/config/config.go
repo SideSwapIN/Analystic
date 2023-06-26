@@ -14,9 +14,6 @@ type Config struct {
 		Password string `mapstructure:"password"`
 		DB       int    `mapstructure:"db"`
 	} `mapstructure:"redis"`
-	EVM struct {
-		RPC string `mapstructure:"rpc"`
-	} `mapstructure:"evm"`
 }
 
 var cfg Config
