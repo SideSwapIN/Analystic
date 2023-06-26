@@ -109,7 +109,8 @@ func Start(chainInfo ChainInfo) {
 			oldBlockBigInt = big.NewInt(oldBlockInt)
 		}
 	}
-	if oldBlockBigInt == nil {
+	if (chainInfo.StartBlock != nil && oldBlockBigInt == nil) ||
+		(chainInfo.StartBlock != nil && chainInfo.StartBlock.Cmp(oldBlockBigInt) > 0) {
 		oldBlockBigInt = chainInfo.StartBlock
 	}
 	// query := ethereum.FilterQuery{
