@@ -2,6 +2,6 @@
 dsn = "root:1Sxnfy7Xwj@tcp(10.245.147.96:3306)/opside_welaunch?charset=utf8mb4&parseTime=True&loc=Local"
 
 [redis]
-host = "127.0.0.1:6379"
-password = "12345678"
+addr = "10.245.126.132:6379"
+password = "PI1kre5nwN"
 db = 1
