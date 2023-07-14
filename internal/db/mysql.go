@@ -12,7 +12,7 @@ var MysqlDB *gorm.DB
 
 // InitDB 初始化数据库连接
 func InitMysqlDB() error {
-	db, err := gorm.Open(mysql.Open(config.GetConfig().Database.DNS), &gorm.Config{})
+	db, err := gorm.Open(mysql.Open(config.GetConfig().Database.DSN), &gorm.Config{})
 	if err != nil {
 		return fmt.Errorf("failed to connect mysql database error: %v", err)
 	}

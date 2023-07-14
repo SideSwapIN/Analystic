@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math/big"
 	"strconv"
+	"sync"
 	"time"
 
 	"github.com/SideSwapIN/Analystic/internal/db"
@@ -126,7 +127,7 @@ func Start(chainInfo ChainInfo) {
 	// }
 	router := chainInfo.Router.Hex()
 	for {
-		time.Sleep(time.Second)
+		time.Sleep(time.Microsecond * 200)
 		optionID := time.Now().UnixMilli()
 		var blockBigInt *big.Int
 		if oldBlockBigInt != nil {
@@ -141,28 +142,34 @@ func Start(chainInfo ChainInfo) {
 
 		txs := block.Transactions()
 		senderOperations := make([]model.SenderOperation, 0)
+		var sw sync.WaitGroup
 		for _, tx := range txs {
-			if tx.To() != nil && tx.To().Hex() == router {
-				methodSig := common.Bytes2Hex(tx.Data()[:4])
-				if methodType, ok := MethodMap[methodSig]; ok {
-					from, err := types.Sender(types.LatestSignerForChainID(tx.ChainId()), tx)
-					if err != nil {
-						logger.Dump(tx)
-						logger.Errorf("types.Sender error: %v", err)
-						continue
+			sw.Add(1)
+			go func(tx *types.Transaction) {
+				defer sw.Done()
+				if tx.To() != nil && tx.To().Hex() == router && len(tx.Data()) >= 4 {
+					methodSig := common.Bytes2Hex(tx.Data()[:4])
+					if methodType, ok := MethodMap[methodSig]; ok {
+						from, err := types.Sender(types.LatestSignerForChainID(tx.ChainId()), tx)
+						if err != nil {
+							logger.Dump(tx)
+							logger.Errorf("types.Sender error: %v", err)
+							return
+						}
+						senderOperations = append(senderOperations, model.SenderOperation{
+							To:          router,
+							From:        from.Hex(),
+							TxHash:      tx.Hash().Hex(),
+							ChainID:     chainInfo.ChainID,
+							BlockNumber: block.NumberU64(),
+							BlockTime:   block.Time(),
+							Type:        methodType,
+						})
 					}
-					senderOperations = append(senderOperations, model.SenderOperation{
-						To:          router,
-						From:        from.Hex(),
-						TxHash:      tx.Hash().Hex(),
-						ChainID:     chainInfo.ChainID,
-						BlockNumber: block.NumberU64(),
-						BlockTime:   block.Time(),
-						Type:        methodType,
-					})
 				}
-			}
+			}(tx)
 		}
+		sw.Wait()
 		if len(senderOperations) > 0 {
 			err = model.CreateSenderOperations(senderOperations)
 			if err != nil {

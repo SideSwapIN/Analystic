@@ -7,7 +7,7 @@ import (
 
 type Config struct {
 	Database struct {
-		DNS string `mapstructure:"dns"`
+		DSN string `mapstructure:"dsn"`
 	} `mapstructure:"database"`
 	Redis struct {
 		Host     string `mapstructure:"host"`

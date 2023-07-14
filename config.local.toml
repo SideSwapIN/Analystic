@@ -1,0 +1,7 @@
+[database]
+dsn = "root:Xiaowu.789@tcp(localhost:3306)/opside_analystic?charset=utf8mb4&parseTime=True&loc=Local"
+
+[redis]
+addr = "10.245.126.132:6379"
+password = "PI1kre5nwN"
+db = 1
